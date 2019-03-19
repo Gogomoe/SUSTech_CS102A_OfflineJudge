@@ -31,14 +31,11 @@ class Process(val user: User, val question: Question, val file: File) {
             }
         }
 
-        if (error == "Wrong Answer") {
-            println("\t\u001B[31mFailed Count $wrongAnswerCount/${question.cases.size}\u001B[0m")
-        } else if (error == "Input Wrong") {
-            println("\u001B[33m$question Input Wrong\u001B[0m")
-        } else if (isError()) {
-            println("\u001B[31m$question Failed: $error\u001B[0m")
-        } else {
-            println("\u001B[32m$question Accept\u001B[0m")
+        when {
+            error == "Wrong Answer" -> Console.error("\tFailed Count $wrongAnswerCount/${question.cases.size}")
+            error == "Input Wrong" -> Console.warning("$question Input Wrong")
+            isError() -> Console.error("$question Failed: $error")
+            else -> Console.accept("$question Accept")
         }
 
     }
@@ -64,9 +61,6 @@ class Process(val user: User, val question: Question, val file: File) {
     }
 
     private fun invoke(case: TestCase) {
-        val stdout = System.out
-        System.setOut(stdout)
-
         val outputFile = user.path.resolve("${case.fullName}.out").toFile()
 
         val invoker = TestInvoker(
@@ -94,7 +88,7 @@ class Process(val user: User, val question: Question, val file: File) {
             error = invoker.error
         }
         if (invoker.wrongAnswer) {
-            println("\u001B[31m$question Case ${case.No} Wrong Answer\u001B[0m")
+            Console.error("$question Case ${case.No} Wrong Answer")
             wrongAnswerCount++
         }
 

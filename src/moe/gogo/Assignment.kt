@@ -13,10 +13,9 @@ class Assignment(root: String, private val questionList: List<String>) {
 
     fun evaluate() {
         for (user in users) {
-            println(user)
+            Console.println(user)
             user.evaluate()
         }
-
     }
 
     private fun User.evaluate() {
