@@ -1,7 +1,7 @@
 OfflineJudge.iml
-.idea
-out
-Assignment*
+.idea/
+out/
+Assignment*/
 
 
 Test1/**/*.class
