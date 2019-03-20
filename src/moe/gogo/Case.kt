@@ -1,11 +1,15 @@
 package moe.gogo
 
+import moe.gogo.check.Checker
 import java.io.File
 import java.nio.file.Path
 
-class TestCase(val question: Question, val path: Path, val No: Int) {
+class Case(val question: Question, val path: Path, val No: Int) {
 
-    val fullName = "${question.name}C$No"
+    val checker: Checker
+        get() = question.checker
+
+    val fullName = "$question Case $No"
 
     private val filename = "case$No"
 
