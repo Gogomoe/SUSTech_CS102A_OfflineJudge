@@ -1,6 +1,6 @@
 package moe.gogo
 
-import moe.gogo.evualator.QuestionEvaluator
+import moe.gogo.evualator.QuestionProcess
 
 class User(val assignment: Assignment, val name: String) {
 
@@ -8,13 +8,13 @@ class User(val assignment: Assignment, val name: String) {
 
     val loader = Loader(path)
 
-    val evaluators: MutableMap<Question, QuestionEvaluator> = mutableMapOf()
+    val processes: MutableMap<Question, QuestionProcess> = mutableMapOf()
 
     init {
         assignment.questions.forEach {
             val file = path.resolve("${it.name}.java").toFile()
-            val evaluator = QuestionEvaluator(this, it, file)
-            evaluators[it] = evaluator
+            val evaluator = QuestionProcess(this, it, file)
+            processes[it] = evaluator
         }
     }
 

@@ -21,7 +21,7 @@ class Assignment(root: String, private val questionList: List<String>) {
 
     private fun User.evaluate() {
         for (question in questions) {
-            val process = this.evaluators[question]
+            val process = this.processes[question]
             val result = process!!.evaluate()
             result.show()
         }

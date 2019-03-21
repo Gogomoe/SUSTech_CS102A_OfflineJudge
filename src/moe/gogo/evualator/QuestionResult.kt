@@ -1,38 +1,47 @@
 package moe.gogo.evualator
 
 import moe.gogo.Console
-import java.lang.Exception
+import moe.gogo.fixer.Mistake
+import moe.gogo.fixer.show
 
-sealed class QuestionResult(val evaluator: QuestionEvaluator) {
+sealed class QuestionResult(val process: QuestionProcess) {
 
-    val question = evaluator.question
+    val question = process.question
+
+    val mistakes = mutableListOf<Mistake>()
 
     abstract fun show()
 
-    class Accept(evaluator: QuestionEvaluator) : QuestionResult(evaluator) {
+    class Accept(process: QuestionProcess) : QuestionResult(process) {
         override fun show() {
             Console.accept("$question Accept")
+            Console.warning(mistakes.show())
+            Console.newline()
         }
     }
 
     class CaseFail(
-        evaluator: QuestionEvaluator,
+        process: QuestionProcess,
         val failCases: List<CaseResult>
-    ) : QuestionResult(evaluator) {
+    ) : QuestionResult(process) {
         override fun show() {
             failCases.forEach { it.show() }
             Console.error("\t$question Fail Cases: ${failCases.size}/${question.cases.size}")
+            Console.warning(mistakes.show())
+            Console.newline()
         }
     }
 
     class CompileError(
-        evaluator: QuestionEvaluator,
+        process: QuestionProcess,
         val error: String,
         val exception: Throwable
     ) :
-        QuestionResult(evaluator) {
+        QuestionResult(process) {
         override fun show() {
             Console.error("$question Failed: $error")
+            Console.warning(mistakes.show())
+            Console.newline()
         }
     }
 
