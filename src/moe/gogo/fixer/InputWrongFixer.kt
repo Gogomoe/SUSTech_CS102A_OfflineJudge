@@ -4,7 +4,7 @@ import moe.gogo.evualator.CaseResult
 import moe.gogo.evualator.QuestionResult
 import java.util.NoSuchElementException
 
-class InputWrongFixer() : MistakeFixer() {
+class InputWrongFixer : MistakeFixer() {
 
     override fun haveMistake(prevResult: QuestionResult, state: EvaluatorState): Boolean {
         if (prevResult !is QuestionResult.CaseFail) {

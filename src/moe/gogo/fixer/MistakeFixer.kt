@@ -11,6 +11,9 @@ abstract class MistakeFixer {
         state: EvaluatorState
     ): Pair<QuestionResult, EvaluatorState>? {
         val fixedState = fix(state.copy())
+        fixedState.outputFile =
+            fixedState.outputFile.append("_" + this::class.simpleName!!.removeSuffix("Fixer"))
+
         val currentResult = fixedState.evaluate()
         if (fixed(prevResult, currentResult)) {
             addMistake(fixedState)

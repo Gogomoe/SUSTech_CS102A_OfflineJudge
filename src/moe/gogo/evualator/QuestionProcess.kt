@@ -21,7 +21,6 @@ class QuestionProcess(val user: User, val question: Question, val source: File) 
         fixers.add(InputWrongFixer())
     }
 
-
     fun evaluate(): QuestionResult {
 
         var state = EvaluatorState(this)
@@ -40,53 +39,6 @@ class QuestionProcess(val user: User, val question: Question, val source: File) 
 
         return result
 
-//        val compileError = compile()
-//        if (compileError != null) {
-//            return compileError
-//        }
-//
-//        val caseResults = question.cases.map { invoke(it) }
-//        val failResults = caseResults.filter { it !is CaseResult.Accept }
-//
-//        if (failResults.isEmpty()) {
-//            return QuestionResult.Accept(this)
-//        }
-//
-//        return QuestionResult.CaseFail(this, failResults)
-    }
-
-    private fun compile(): QuestionResult.CompileError? {
-        if (!source.exists()) {
-            return QuestionResult.CompileError(
-                this,
-                "Source File Not Found",
-                FileNotFoundException()
-            )
-        }
-
-        Compiler.compile(source)
-
-        try {
-            val c = user.loader.loadClass(question.name)
-            main = c.getMethod("main", Array<String>::class.java)
-        } catch (e: NoClassDefFoundError) {
-            return QuestionResult.CompileError(this, "Package Included", e)
-        } catch (e: Exception) {
-            return QuestionResult.CompileError(this, "Load Class Failed", e)
-        }
-        return null
-    }
-
-    private fun invoke(case: Case): CaseResult {
-        val outputFile = user.path.resolve("${case.fullName}.out").toFile()
-
-        val invoker = CaseInvoker(
-            case,
-            main!!,
-            outputFile
-        )
-
-        return invoker.invoke()
     }
 
 }

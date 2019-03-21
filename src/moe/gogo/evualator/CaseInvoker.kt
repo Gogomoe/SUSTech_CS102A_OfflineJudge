@@ -47,8 +47,4 @@ class CaseInvoker(
 
     }
 
-    fun clearOutput() {
-        output.delete()
-    }
-
 }

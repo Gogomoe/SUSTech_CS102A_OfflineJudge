@@ -10,6 +10,7 @@ class Case(val question: Question, val path: Path, val No: Int) {
         get() = question.checker
 
     val fullName = "$question Case $No"
+    val simpleName = "${question}C$No"
 
     private val filename = "case$No"
 

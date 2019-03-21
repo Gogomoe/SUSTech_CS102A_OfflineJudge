@@ -10,6 +10,10 @@ import java.io.File
 import java.io.FileNotFoundException
 import java.lang.reflect.Method
 
+typealias FileBuilder = (Case) -> File
+
+fun FileBuilder.append(str: String): FileBuilder = { File(this(it).path + str) }
+
 class EvaluatorState(val process: QuestionProcess) : Cloneable {
 
     val user = process.user
@@ -18,9 +22,9 @@ class EvaluatorState(val process: QuestionProcess) : Cloneable {
     var source: File = user.path.resolve("${question.name}.java").toFile()
     var main: Method? = null
 
-    var outputFile: (Case) -> File = { user.path.resolve("${it.fullName}.out").toFile() }
+    var outputFile: FileBuilder = { user.path.resolve("${it.simpleName}.out").toFile() }
     var args: (Case) -> Array<String> = { it.args }
-    var inputFile: (Case) -> File = { it.input }
+    var inputFile: FileBuilder = { it.input }
 
     var isCompiled = false
 
