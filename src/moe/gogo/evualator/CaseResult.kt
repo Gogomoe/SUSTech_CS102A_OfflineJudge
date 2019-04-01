@@ -1,7 +1,7 @@
 package moe.gogo.evualator
 
-import moe.gogo.Console
 import moe.gogo.Case
+import moe.gogo.Console
 
 sealed class CaseResult(val case: Case) {
 

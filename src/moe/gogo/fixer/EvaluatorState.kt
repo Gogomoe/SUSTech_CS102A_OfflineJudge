@@ -10,7 +10,6 @@ import moe.gogo.evualator.QuestionResult
 import java.io.File
 import java.io.FileNotFoundException
 import java.io.PrintStream
-import java.lang.RuntimeException
 import java.lang.reflect.InvocationTargetException
 import java.lang.reflect.Method
 import java.util.*

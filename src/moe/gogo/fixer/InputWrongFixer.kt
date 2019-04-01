@@ -2,7 +2,7 @@ package moe.gogo.fixer
 
 import moe.gogo.evualator.CaseResult
 import moe.gogo.evualator.QuestionResult
-import java.util.NoSuchElementException
+import java.util.*
 
 class InputWrongFixer : MistakeFixer() {
 

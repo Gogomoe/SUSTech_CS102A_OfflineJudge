@@ -2,10 +2,7 @@ package moe.gogo.evualator
 
 import moe.gogo.Question
 import moe.gogo.User
-import moe.gogo.fixer.EvaluatorState
-import moe.gogo.fixer.InputWrongFixer
-import moe.gogo.fixer.MistakeFixer
-import moe.gogo.fixer.MultiScannerFixer
+import moe.gogo.fixer.*
 import java.io.File
 import java.lang.reflect.Method
 
@@ -13,9 +10,12 @@ class QuestionProcess(val user: User, val question: Question, val source: File) 
 
     var main: Method? = null
 
+    val preFixers: MutableList<PreMistakeFixer> = mutableListOf()
     val fixers: MutableList<MistakeFixer> = mutableListOf()
 
     init {
+        preFixers.add(EncodeWithBomFixer())
+        preFixers.add(SystemExitFixer())
         fixers.add(MultiScannerFixer())
         fixers.add(InputWrongFixer())
     }
@@ -23,7 +23,16 @@ class QuestionProcess(val user: User, val question: Question, val source: File) 
     fun evaluate(): QuestionResult {
 
         var state = EvaluatorState(this)
-        var result = state.evaluate()
+
+        preFixers.forEach {
+            if (it.haveMistake(state)) {
+                val fixed = it.tryToFix(state)
+                state.clear()
+                state = fixed
+            }
+        }
+
+        var result: QuestionResult = state.evaluate()
 
         fixers.forEach {
             if (it.haveMistake(result, state)) {
