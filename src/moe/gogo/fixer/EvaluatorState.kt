@@ -3,12 +3,15 @@ package moe.gogo.fixer
 import moe.gogo.Case
 import moe.gogo.Compiler
 import moe.gogo.Loader
-import moe.gogo.evualator.CaseInvoker
+import moe.gogo.check.CheckResult
 import moe.gogo.evualator.CaseResult
 import moe.gogo.evualator.QuestionProcess
 import moe.gogo.evualator.QuestionResult
 import java.io.File
 import java.io.FileNotFoundException
+import java.io.PrintStream
+import java.lang.RuntimeException
+import java.lang.reflect.InvocationTargetException
 import java.lang.reflect.Method
 import java.util.*
 
@@ -17,6 +20,7 @@ typealias FileBuilder = (Case) -> File
 fun FileBuilder.append(str: String): FileBuilder = { File(this(it).path + str) }
 
 typealias Injector = (case: Case) -> Unit
+typealias ErrorHandle = (case: Case, error: Throwable) -> Boolean
 
 class EvaluatorState(val process: QuestionProcess) : Cloneable {
 
@@ -38,6 +42,7 @@ class EvaluatorState(val process: QuestionProcess) : Cloneable {
 
     var beforeInvoke: Deque<Injector> = ArrayDeque<Injector>()
     var afterInvoke: Deque<Injector> = ArrayDeque<Injector>()
+    var handleError: Deque<ErrorHandle> = ArrayDeque<ErrorHandle>()
 
     var toClear = mutableListOf<FileBuilder>()
 
@@ -90,7 +95,6 @@ class EvaluatorState(val process: QuestionProcess) : Cloneable {
     private fun invoke(case: Case): CaseResult {
         val invoker = CaseInvoker(
             case,
-            main!!,
             outputFile(case),
             args(case),
             inputFile(case)
@@ -99,11 +103,60 @@ class EvaluatorState(val process: QuestionProcess) : Cloneable {
         return invoker.invoke()
     }
 
+    inner class CaseInvoker(
+        val case: Case,
+        val output: File,
+        val args: Array<String> = case.args,
+        val input: File = case.input
+    ) {
+        val main: Method = this@EvaluatorState.main!!
+
+        fun invoke(): CaseResult {
+            val stdout = System.out
+
+            val output = PrintStream(this.output)
+            val input = this.input.inputStream()
+
+            System.setIn(input)
+            System.setOut(output)
+            try {
+                main.invoke(null, args)
+            } catch (e: InvocationTargetException) {
+                val error = e.targetException
+                var handled = false
+                this@EvaluatorState.handleError.forEach {
+                    handled = handled || it(case, error)
+                }
+                if (!handled) {
+                    error!!.printStackTrace(output)
+                    return CaseResult.RuntimeError(case, error)
+                }
+            } catch (e: Exception) {
+                e.printStackTrace()
+                return CaseResult.RuntimeError(case, e)
+            } finally {
+                System.setOut(stdout)
+                output.close()
+                input.close()
+            }
+
+            val result = case.checker.check(case, this.output)
+            return if (result == CheckResult.WRONG_ANSWER) {
+                CaseResult.WrongAnswer(case)
+            } else {
+                CaseResult.Accept(case)
+            }
+
+        }
+
+    }
+
     fun copy(): EvaluatorState {
         val copy = clone() as EvaluatorState
         copy.mistakes = copy.mistakes.toMutableList()
         copy.beforeInvoke = ArrayDeque(copy.beforeInvoke)
         copy.afterInvoke = ArrayDeque(copy.afterInvoke)
+        copy.handleError = ArrayDeque(copy.handleError)
         copy.toClear = copy.toClear.toMutableList()
         return copy
     }
