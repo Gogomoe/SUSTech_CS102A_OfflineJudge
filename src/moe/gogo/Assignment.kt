@@ -63,6 +63,10 @@ class Assignment(val name: String, val path: Path) {
             users.add(usersBuilder)
         }
 
+        fun setMistakes(setter: () -> Unit) {
+            setter()
+        }
+
     }
 
 }

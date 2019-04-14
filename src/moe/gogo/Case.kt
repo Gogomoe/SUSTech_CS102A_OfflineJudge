@@ -5,6 +5,7 @@ import moe.gogo.check.Checker
 class Case(
     val question: Question,
     val index: Int,
+    val score: Int,
     var input: String,
     var args: Array<String>,
     var answer: String
@@ -37,7 +38,7 @@ class CaseBuilder(val index: Int) {
     }
 
     fun build(question: Question): Case {
-        return Case(question, index, input, args, answer)
+        return Case(question, index, score, input, args, answer)
     }
 
 }

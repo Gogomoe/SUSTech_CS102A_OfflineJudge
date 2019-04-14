@@ -18,6 +18,8 @@ sealed class QuestionResult(val process: QuestionProcess) {
             Console.warning(mistakes.show())
             Console.newline()
         }
+
+        override fun score(): Int = question.score
     }
 
     class CaseFail(
@@ -30,6 +32,9 @@ sealed class QuestionResult(val process: QuestionProcess) {
             Console.warning(mistakes.show())
             Console.newline()
         }
+
+        override fun score(): Int = question.score - failCases.map { it.case.score }.sum()
+
     }
 
     class CompileError(
@@ -43,7 +48,12 @@ sealed class QuestionResult(val process: QuestionProcess) {
             Console.warning(mistakes.show())
             Console.newline()
         }
+
+        override fun score(): Int = question.score - question.cases.map { it.score }.sum()
+
     }
+
+    abstract fun score(): Int
 
 
 }

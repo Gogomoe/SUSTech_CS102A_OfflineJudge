@@ -53,7 +53,7 @@ class MultiScannerFixer : MistakeFixer() {
     }
 
     override fun addMistake(state: EvaluatorState) {
-        state.addMistake(Mistake.MULTI_SCANNER)
+        state.addMistake(Mistake.MultiScanner)
     }
 
     private fun countFailedCases(result: QuestionResult.CaseFail): Int {

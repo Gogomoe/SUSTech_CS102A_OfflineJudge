@@ -36,7 +36,7 @@ class SystemExitFixer : PreMistakeFixer() {
     }
 
     override fun addMistake(state: EvaluatorState) {
-        state.addMistake(Mistake.SYSTEM_EXIT)
+        state.addMistake(Mistake.SystemExit)
     }
 
 }

@@ -3,7 +3,7 @@ package moe.gogo
 import moe.gogo.check.Checker
 import moe.gogo.check.CompleteChecker
 
-class Question(val assignment: Assignment, val name: String) {
+class Question(val assignment: Assignment, val name: String, val score: Int) {
 
     var cases: List<Case> = mutableListOf()
 
@@ -28,7 +28,7 @@ class QuestionBuilder(val name: String) {
     }
 
     fun build(assignment: Assignment): Question {
-        return Question(assignment, name).also { question ->
+        return Question(assignment, name, score).also { question ->
             question.checker = checker
             question.cases = cases.map { it.build(question) }
         }

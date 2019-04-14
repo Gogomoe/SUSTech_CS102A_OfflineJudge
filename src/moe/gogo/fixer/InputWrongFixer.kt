@@ -37,7 +37,7 @@ class InputWrongFixer : MistakeFixer() {
     }
 
     override fun addMistake(state: EvaluatorState) {
-        state.addMistake(Mistake.INPUT_WRONG)
+        state.addMistake(Mistake.InputWrong)
     }
 
 }

@@ -50,7 +50,7 @@ class EncodeWithBomFixer : PreMistakeFixer() {
     }
 
     override fun addMistake(state: EvaluatorState) {
-        state.addMistake(Mistake.ENCODE_WITH_BOM)
+        state.addMistake(Mistake.EncodeWithBOM)
     }
 
 }

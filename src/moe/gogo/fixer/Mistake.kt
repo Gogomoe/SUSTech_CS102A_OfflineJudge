@@ -1,7 +1,10 @@
 package moe.gogo.fixer
 
 enum class Mistake {
-    INPUT_WRONG, MULTI_SCANNER, ENCODE_WITH_BOM, SYSTEM_EXIT
+    InputWrong, MultiScanner, EncodeWithBOM, SystemExit;
+
+    var score: Int = 0
+    var maxScore: Int = 0
 }
 
 fun List<Mistake>.show() = if (this.isEmpty()) "" else " $this"
