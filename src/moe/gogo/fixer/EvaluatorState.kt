@@ -119,7 +119,9 @@ class EvaluatorState(val process: QuestionProcess) : Cloneable {
             System.setIn(input)
             System.setOut(output)
             try {
-                main.invoke(null, args)
+                invokeMainWithLimitedTime {
+                    return CaseResult.TimeLimitExceeded(case)
+                }
             } catch (e: InvocationTargetException) {
                 val error = e.targetException
                 var handled = false
@@ -146,6 +148,26 @@ class EvaluatorState(val process: QuestionProcess) : Cloneable {
                 CaseResult.Accept(case)
             }
 
+        }
+
+        private inline fun invokeMainWithLimitedTime(timeout: () -> Unit) {
+            var throwable: Throwable? = null
+            val thread = Thread {
+                main.invoke(null, args)
+            }
+            thread.setUncaughtExceptionHandler { _, e ->
+                throwable = e
+            }
+            thread.start()
+            thread.join(3000)
+            if (thread.isAlive) {
+                thread.stop()
+                Thread.sleep(100)
+                timeout()
+            }
+            if (throwable != null) {
+                throw throwable!!
+            }
         }
 
     }

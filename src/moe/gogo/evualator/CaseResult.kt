@@ -21,6 +21,13 @@ sealed class CaseResult(val case: Case) {
         }
     }
 
+    class TimeLimitExceeded(case: Case) : CaseResult(case) {
+        override fun show() {
+            Console.error("${case.fullName} Time Limit Exceeded")
+            Console.newline()
+        }
+    }
+
     class RuntimeError(case: Case, val error: Throwable) : CaseResult(case) {
         override fun show() {
             Console.error("${case.fullName} Runtime Error: ${error.javaClass.name}")
