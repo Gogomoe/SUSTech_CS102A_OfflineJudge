@@ -14,7 +14,7 @@ class InputWrongFixer : MistakeFixer() {
     }
 
     override fun fix(state: EvaluatorState): EvaluatorState {
-        state.inputFile = { it.argsFile }
+        state.input = { it.args.joinToString(" ") }
         return state
     }
 

@@ -1,24 +1,43 @@
 package moe.gogo
 
 import moe.gogo.check.Checker
-import java.io.File
-import java.nio.file.Path
 
-class Case(val question: Question, val path: Path, val No: Int) {
+class Case(
+    val question: Question,
+    val index: Int,
+    var input: String,
+    var args: Array<String>,
+    var answer: String
+) {
 
     val checker: Checker
         get() = question.checker
 
-    val fullName = "$question Case $No"
-    val simpleName = "${question}C$No"
+    val fullName = "$question Case $index"
+    val simpleName = "${question}C$index"
 
-    private val filename = "case$No"
+}
 
-    val input: File = path.resolve("$filename.input").toFile()
+class CaseBuilder(val index: Int) {
 
-    var argsFile: File = path.resolve("$filename.args").toFile()
-    val args: Array<String> = argsFile.readText().split(" ").toTypedArray()
+    var input: String = ""
+    var args: Array<String> = emptyArray()
+    var answer: String = ""
 
-    val answer: String = path.resolve("$filename.answer").toFile().readText()
+    var score: Int = 0
+
+    var argsString: String
+        get() = args.joinToString(" ")
+        set(value) {
+            args = value.split(spaceRegex).toTypedArray()
+        }
+
+    companion object {
+        private val spaceRegex = """\s+""".toRegex()
+    }
+
+    fun build(question: Question): Case {
+        return Case(question, index, input, args, answer)
+    }
 
 }

@@ -25,15 +25,15 @@ class EvaluatorState(val process: QuestionProcess) : Cloneable {
 
     val user = process.user
     val question = process.question
-    val userpath = user.path
+    val userPath = user.path
 
     var loader: Loader = user.loader
-    var source: File = userpath.resolve("${question.name}.java").toFile()
+    var source: File = userPath.resolve("${question.name}.java").toFile()
     var main: Method? = null
 
-    var outputFile: FileBuilder = { userpath.resolve("${it.simpleName}.out").toFile() }
+    var outputFile: FileBuilder = { userPath.resolve("${it.simpleName}.out").toFile() }
     var args: (Case) -> Array<String> = { it.args }
-    var inputFile: FileBuilder = { it.input }
+    var input: (Case) -> String = { it.input }
 
     var isCompiled = false
 
@@ -96,7 +96,7 @@ class EvaluatorState(val process: QuestionProcess) : Cloneable {
             case,
             outputFile(case),
             args(case),
-            inputFile(case)
+            input(case)
         )
 
         return invoker.invoke()
@@ -106,7 +106,7 @@ class EvaluatorState(val process: QuestionProcess) : Cloneable {
         val case: Case,
         val output: File,
         val args: Array<String> = case.args,
-        val input: File = case.input
+        val input: String = case.input
     ) {
         val main: Method = this@EvaluatorState.main!!
 
@@ -114,7 +114,7 @@ class EvaluatorState(val process: QuestionProcess) : Cloneable {
             val stdout = System.out
 
             val output = PrintStream(this.output)
-            val input = this.input.inputStream()
+            val input = this.input.byteInputStream()
 
             System.setIn(input)
             System.setOut(output)

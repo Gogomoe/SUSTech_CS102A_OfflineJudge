@@ -1,16 +1,13 @@
 package moe.gogo
 
-import java.io.File
+import moe.gogo.evualator.QuestionProcess
+import java.nio.file.Path
 
-class Assignment(root: String, private val questionList: List<String>) {
+class Assignment(val name: String, val path: Path) {
 
-    val path = File(root).toPath()
+    var questions: List<Question> = emptyList()
 
-    val questions: List<Question> = questionList.map { Question(this, it) }
-
-    val users: List<User> = path.toFile()
-        .listFiles { it -> it.isDirectory && it.name !in questionList }
-        .map { User(this, it.name) }
+    var users: List<User> = emptyList()
 
     fun evaluate() {
         for (user in users) {
@@ -21,11 +18,51 @@ class Assignment(root: String, private val questionList: List<String>) {
 
     private fun User.evaluate() {
         for (question in questions) {
-            val process = this.processes[question]
-            val result = process!!.evaluate()
+            val process = QuestionProcess(this, question)
+            val result = process.evaluate()
             result.show()
         }
     }
 
+    companion object {
+        operator fun invoke(
+            name: String,
+            path: String = name,
+            builder: AssignmentBuilder.() -> Unit
+        ) {
+            val assignmentBuilder = AssignmentBuilder(name, path)
+            assignmentBuilder.builder()
+            val assignment = assignmentBuilder.build()
+            assignment.evaluate()
+        }
+    }
+
+    class AssignmentBuilder(val name: String, path: String) {
+
+        val path: Path = Path.of(path)
+
+        val questions: MutableList<QuestionBuilder> = mutableListOf()
+        val users: MutableList<UsersBuilder> = mutableListOf()
+
+        fun addQuestion(name: String, builder: QuestionBuilder.() -> Unit) {
+            val question = QuestionBuilder(name)
+            question.builder()
+            questions.add(question)
+        }
+
+        fun build(): Assignment {
+            return Assignment(name, path).also { assignment ->
+                assignment.questions = questions.map { it.build(assignment) }
+                assignment.users = users.map { it.build() }.flatten()
+            }
+        }
+
+        fun addUsers(builder: UsersBuilder.() -> Unit) {
+            val usersBuilder = UsersBuilder(path)
+            usersBuilder.builder()
+            users.add(usersBuilder)
+        }
+
+    }
 
 }

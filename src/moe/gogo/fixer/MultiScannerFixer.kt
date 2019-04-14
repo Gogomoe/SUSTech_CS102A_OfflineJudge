@@ -22,7 +22,7 @@ class MultiScannerFixer : MistakeFixer() {
         )
         text = "import moe.gogo.fixer.ScannerPatch;\n$text"
 
-        val root = state.userpath.resolve("MultiScanner")
+        val root = state.userPath.resolve("MultiScanner")
         val newSource = root.resolve(state.source.name).toFile()
         newSource.parentFile.mkdirs()
         newSource.createNewFile()
@@ -32,7 +32,7 @@ class MultiScannerFixer : MistakeFixer() {
         state.source = newSource
         state.loader = newLoader
         state.beforeInvoke.addFirst { case ->
-            val scanner = Scanner(state.inputFile(case))
+            val scanner = Scanner(state.input(case))
             ScannerPatch.setScanner(scanner)
         }
         state.toClear.add { root.toFile() }

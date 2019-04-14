@@ -2,25 +2,38 @@ package moe.gogo
 
 import moe.gogo.check.Checker
 import moe.gogo.check.CompleteChecker
-import java.nio.file.Files
 
 class Question(val assignment: Assignment, val name: String) {
 
-    val path = assignment.path.resolve(name)
+    var cases: List<Case> = mutableListOf()
 
-    val cases = mutableListOf<Case>()
+    var checker: Checker = CompleteChecker()
 
-    val checker: Checker = CompleteChecker()
+    override fun toString(): String = name
 
-    init {
-        for (i in 1..10) {
-            if (!Files.exists(path.resolve("case$i.input"))) {
-                break
-            }
-            cases.add(Case(this, path, i))
+}
+
+class QuestionBuilder(val name: String) {
+
+    val cases: MutableList<CaseBuilder> = mutableListOf()
+
+    var checker: Checker = CompleteChecker()
+
+    private var index = 1
+
+    fun addCase(builder: CaseBuilder.() -> Unit) {
+        val case = CaseBuilder(index++)
+        case.builder()
+        cases.add(case)
+    }
+
+    fun build(assignment: Assignment): Question {
+        return Question(assignment, name).also { question ->
+            question.checker = checker
+            question.cases = cases.map { it.build(question) }
         }
     }
 
-    override fun toString(): String = name
+    var score: Int = 0
 
 }

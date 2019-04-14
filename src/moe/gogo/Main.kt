@@ -1,9 +1,24 @@
 package moe.gogo
 
 fun main() {
+    Assignment("Assignment1") {
+        addQuestion("A1Q1") {
+            score = 20
 
-    Assignment("Assignment1", listOf("A1Q1", "A1Q2", "A1Q3", "A1Q4", "A1Q5")).evaluate()
+            addCase {
+                argsString = """3"""
+                answer = """
+                    18.84
+                    28.26
+                """.trimIndent()
+            }
+        }
 
+        addUsers {
+            searchPath = "."
+            userMatcher = """.*\(\d+\)""".toRegex()
+
+            sourceRoot = """%name%/Submission attachment(s)"""
+        }
+    }
 }
-
-

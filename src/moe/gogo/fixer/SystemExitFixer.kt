@@ -18,7 +18,7 @@ class SystemExitFixer : PreMistakeFixer() {
             """throw new RuntimeException("SystemExit")"""
         )
 
-        val root = state.userpath.resolve("SystemExit")
+        val root = state.userPath.resolve("SystemExit")
         val newSource = root.resolve(state.source.name).toFile()
         newSource.parentFile.mkdirs()
         newSource.createNewFile()

@@ -1,24 +1,31 @@
 package moe.gogo
 
-import moe.gogo.evualator.QuestionProcess
+import java.nio.file.Path
 
-class User(val assignment: Assignment, val name: String) {
+class User(val name: String, val sourcePath: Path) {
 
-    val path = assignment.path.resolve(name).resolve("Submission attachment(s)")
+    val path = sourcePath
 
     val loader = Loader(path)
 
-    val processes: MutableMap<Question, QuestionProcess> = mutableMapOf()
+    override fun toString(): String = name
 
-    init {
-        assignment.questions.forEach {
-            val file = path.resolve("${it.name}.java").toFile()
-            val evaluator = QuestionProcess(this, it, file)
-            processes[it] = evaluator
+}
+
+class UsersBuilder(val root: Path) {
+
+    fun build(): List<User> {
+        val searchPath = root.resolve(searchPath)
+        val users = searchPath.toFile().list { _, name -> name.matches(userMatcher) }
+        return users.toList().map {
+            User(
+                it,
+                root.resolve(sourceRoot.replace("%name%", it))
+            )
         }
     }
 
-    override fun toString(): String = name
-
-
+    var searchPath: String = "."
+    var userMatcher: Regex = """.*""".toRegex()
+    var sourceRoot: String = "%name%"
 }

@@ -35,7 +35,7 @@ class EncodeWithBomFixer : PreMistakeFixer() {
             fixed = bytes.slice(3 until bytes.size).toByteArray()
         }
 
-        val root = state.userpath.resolve("EncodeWithBom")
+        val root = state.userPath.resolve("EncodeWithBom")
         val newSource = root.resolve(state.source.name).toFile()
         newSource.parentFile.mkdirs()
         newSource.createNewFile()
