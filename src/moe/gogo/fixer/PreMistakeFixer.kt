@@ -1,5 +1,8 @@
 package moe.gogo.fixer
 
+import moe.gogo.evualator.EvaluatorState
+import moe.gogo.evualator.append
+
 abstract class PreMistakeFixer {
 
     abstract fun haveMistake(state: EvaluatorState): Boolean

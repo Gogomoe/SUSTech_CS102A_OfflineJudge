@@ -1,6 +1,8 @@
 package moe.gogo.fixer
 
+import moe.gogo.evualator.EvaluatorState
 import moe.gogo.evualator.QuestionResult
+import moe.gogo.evualator.append
 
 abstract class MistakeFixer {
 

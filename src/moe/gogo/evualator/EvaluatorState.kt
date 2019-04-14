@@ -1,12 +1,10 @@
-package moe.gogo.fixer
+package moe.gogo.evualator
 
 import moe.gogo.Case
 import moe.gogo.Compiler
 import moe.gogo.Loader
 import moe.gogo.check.CheckResult
-import moe.gogo.evualator.CaseResult
-import moe.gogo.evualator.QuestionProcess
-import moe.gogo.evualator.QuestionResult
+import moe.gogo.fixer.Mistake
 import java.io.File
 import java.io.FileNotFoundException
 import java.io.PrintStream
@@ -111,46 +109,65 @@ class EvaluatorState(val process: QuestionProcess) : Cloneable {
         val main: Method = this@EvaluatorState.main!!
 
         fun invoke(): CaseResult {
+
+            redirectInputAndOutput { stdout, stderr ->
+
+                try {
+                    invokeMainWithLimitedTime {
+                        return CaseResult.TimeLimitExceeded(case)
+                    }
+                } catch (e: InvocationTargetException) {
+                    handleInvocationException(e) { error ->
+                        e.printStackTrace()
+                        return CaseResult.RuntimeError(case, error)
+                    }
+                } catch (e: Exception) {
+                    e.printStackTrace(stderr)
+                    return CaseResult.RuntimeError(case, e)
+                }
+
+            }
+
+            return checkResult()
+
+        }
+
+        private inline fun handleInvocationException(
+            e: InvocationTargetException,
+            uncatchedErrorHandler: (Throwable) -> Unit
+        ) {
+            val error = e.targetException
+            var handled = false
+            this@EvaluatorState.handleError.forEach {
+                handled = handled || it(case, error)
+            }
+            if (!handled) {
+                uncatchedErrorHandler(error)
+            }
+        }
+
+        private inline fun redirectInputAndOutput(todo: (PrintStream, PrintStream) -> Unit) {
             val stdout = System.out
+            val stderr = System.err
 
             val output = PrintStream(this.output)
             val input = this.input.byteInputStream()
 
             System.setIn(input)
             System.setOut(output)
+            System.setErr(output)
+
             try {
-                invokeMainWithLimitedTime {
-                    return CaseResult.TimeLimitExceeded(case)
-                }
-            } catch (e: InvocationTargetException) {
-                val error = e.targetException
-                var handled = false
-                this@EvaluatorState.handleError.forEach {
-                    handled = handled || it(case, error)
-                }
-                if (!handled) {
-                    error!!.printStackTrace(output)
-                    return CaseResult.RuntimeError(case, error)
-                }
-            } catch (e: Exception) {
-                e.printStackTrace()
-                return CaseResult.RuntimeError(case, e)
+                todo(stdout, stderr)
             } finally {
                 System.setOut(stdout)
+                System.setErr(stderr)
                 output.close()
                 input.close()
             }
-
-            val result = case.checker.check(case, this.output)
-            return if (result == CheckResult.WRONG_ANSWER) {
-                CaseResult.WrongAnswer(case)
-            } else {
-                CaseResult.Accept(case)
-            }
-
         }
 
-        private inline fun invokeMainWithLimitedTime(timeout: () -> Unit) {
+        private inline fun invokeMainWithLimitedTime(timeoutHandler: () -> Unit) {
             var throwable: Throwable? = null
             val thread = Thread {
                 main.invoke(null, args)
@@ -163,10 +180,20 @@ class EvaluatorState(val process: QuestionProcess) : Cloneable {
             if (thread.isAlive) {
                 thread.stop()
                 Thread.sleep(100)
-                timeout()
+                timeoutHandler()
             }
             if (throwable != null) {
                 throw throwable!!
+            }
+        }
+
+        private fun checkResult(): CaseResult {
+            val result = case.checker.check(case, this.output)
+
+            return if (result == CheckResult.WRONG_ANSWER) {
+                CaseResult.WrongAnswer(case)
+            } else {
+                CaseResult.Accept(case)
             }
         }
 

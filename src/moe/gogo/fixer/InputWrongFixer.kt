@@ -1,6 +1,7 @@
 package moe.gogo.fixer
 
 import moe.gogo.evualator.CaseResult
+import moe.gogo.evualator.EvaluatorState
 import moe.gogo.evualator.QuestionResult
 import java.util.*
 

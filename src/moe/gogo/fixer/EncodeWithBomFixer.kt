@@ -1,6 +1,7 @@
 package moe.gogo.fixer
 
 import moe.gogo.Loader
+import moe.gogo.evualator.EvaluatorState
 
 class EncodeWithBomFixer : PreMistakeFixer() {
 
