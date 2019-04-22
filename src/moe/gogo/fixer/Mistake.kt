@@ -1,7 +1,7 @@
 package moe.gogo.fixer
 
 enum class Mistake {
-    InputWrong, MultiScanner, EncodeWithBOM, SystemExit;
+    InputWrong, MultiScanner, EncodeWithBOM, SystemExit, FormatError;
 
     var score: Int = 0
     var maxScore: Int = 0

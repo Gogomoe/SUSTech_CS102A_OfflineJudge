@@ -58,13 +58,19 @@ class EvaluatorState(val process: QuestionProcess) : Cloneable {
             afterInvoke.forEach { it(case) }
             result
         }
-        val failResults = caseResults.filter { it !is CaseResult.Accept }
+        val failResults = caseResults.filter { !it.accept() }
 
-        if (failResults.isEmpty()) {
-            return QuestionResult.Accept(process)
+        return if (failResults.isEmpty()) {
+            QuestionResult.Accept(process)
+        } else {
+            QuestionResult.CaseFail(process, failResults)
+        }.apply {
+            val existFormatError = caseResults.find { it is CaseResult.FormatError } != null
+            if (existFormatError) {
+                this.mistakes.add(Mistake.FormatError)
+            }
         }
 
-        return QuestionResult.CaseFail(process, failResults)
     }
 
     private fun compile(): QuestionResult.CompileError? {
@@ -190,10 +196,10 @@ class EvaluatorState(val process: QuestionProcess) : Cloneable {
         private fun checkResult(): CaseResult {
             val result = case.checker.check(case, this.output)
 
-            return if (result == CheckResult.WRONG_ANSWER) {
-                CaseResult.WrongAnswer(case)
-            } else {
-                CaseResult.Accept(case)
+            return when (result) {
+                CheckResult.WRONG_ANSWER -> CaseResult.WrongAnswer(case)
+                CheckResult.FORMAT_ERROR -> CaseResult.FormatError(case)
+                CheckResult.ACCEPT -> CaseResult.Accept(case)
             }
         }
 

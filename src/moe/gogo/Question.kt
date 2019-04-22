@@ -1,13 +1,13 @@
 package moe.gogo
 
 import moe.gogo.check.Checker
-import moe.gogo.check.CompleteChecker
+import moe.gogo.check.FormatChecker
 
 class Question(val assignment: Assignment, val name: String, val score: Int) {
 
     var cases: List<Case> = mutableListOf()
 
-    var checker: Checker = CompleteChecker()
+    var checker: Checker = FormatChecker()
 
     override fun toString(): String = name
 
@@ -17,7 +17,7 @@ class QuestionBuilder(val name: String) {
 
     val cases: MutableList<CaseBuilder> = mutableListOf()
 
-    var checker: Checker = CompleteChecker()
+    var checker: Checker = FormatChecker()
 
     private var index = 1
 
