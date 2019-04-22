@@ -118,7 +118,7 @@ class EvaluatorState(val process: QuestionProcess) : Cloneable {
                     }
                 } catch (e: InvocationTargetException) {
                     handleInvocationException(e) { error ->
-                        e.printStackTrace()
+                        error.printStackTrace()
                         return CaseResult.RuntimeError(case, error)
                     }
                 } catch (e: Exception) {
